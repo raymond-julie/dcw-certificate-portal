@@ -34,8 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $passcode = trim($_POST['super_admin_passcode'] ?? '');
 
-    if ($passcode !== SUPER_ADMIN_PASSCODE) {
-        $error = "Security Error: Invalid Super Admin Passcode.";
+    $nameChanged = ($eventName !== $event['name']);
+
+    if ($nameChanged && $passcode !== SUPER_ADMIN_PASSCODE) {
+        $error = "Security Error: Invalid Super Admin Passcode. Passcode is required to change the event name.";
     } elseif (!$eventName) {
         $error = "Event name is required.";
     } else {
@@ -78,11 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href="dashboard.php" class="btn" style="background: #6c757d;">Back</a>
     </div>
     
-    <form method="POST" action="">
+    <form method="POST" action="" onsubmit="return confirmEdit();">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token()) ?>">
         <div class="form-group">
             <label>Event Name</label>
-            <input type="text" name="name" required value="<?= htmlspecialchars($event['name']) ?>">
+            <input type="text" name="name" id="eventNameInput" required value="<?= htmlspecialchars($event['name']) ?>">
         </div>
         
         <div class="form-group">
@@ -98,11 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
         
-        <div class="form-group" style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
-            <label style="color: #d9534f;">Super Admin Passcode <span style="font-size: 11px; color: #999; font-weight: normal;">(Required to save changes)</span></label>
-            <input type="password" name="super_admin_passcode" required placeholder="Enter passcode to authorize">
-        </div>
-        
+        <input type="hidden" name="super_admin_passcode" id="edit_passcode" value="">
         <button type="submit" class="btn" style="width: 100%; margin-bottom: 15px;">Save Changes</button>
     </form>
     
@@ -116,6 +114,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <script src="script.js"></script>
 <script>
+    const originalEventName = <?= json_encode($event['name']) ?>;
+
+    function confirmEdit() {
+        const currentName = document.getElementById('eventNameInput').value.trim();
+        
+        if (currentName !== originalEventName) {
+            let code = prompt("Security Check: You are changing the Event Name. Please enter the Super Admin Passcode to authorize this change:");
+            if (code) {
+                document.getElementById('edit_passcode').value = code;
+                return true;
+            }
+            alert("Save cancelled: Passcode is required to change the event name.");
+            return false;
+        }
+        
+        return true; // Name didn't change, allow save without passcode
+    }
+
     function confirmDelete() {
         if (!confirm('Are you sure you want to completely delete this event? This will erase all associated participants and certificates permanently.')) {
             return false;

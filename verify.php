@@ -309,5 +309,10 @@ $roleName = $certData['role_name'] ? " as " . htmlspecialchars($certData['role_n
             document.getElementById('pdf-preview').style.display = 'none';
         });
     </script>
+
+    <div style="text-align: center; padding: 20px; margin-top: 40px; color: #64748b; font-size: 14px;">
+        &copy; <?= date('Y') ?> <a href="https://dcwwiki.org/" target="_blank" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Deoband Community Wikimedia</a>. All Rights Reserved.
+    </div>
 </body>
 </html>
+

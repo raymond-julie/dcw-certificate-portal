@@ -7,6 +7,24 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
+$passcode = trim($_POST['super_admin_passcode'] ?? '');
+
+// If they submitted a passcode, check it and unlock session
+if ($passcode !== '') {
+    if ($passcode === SUPER_ADMIN_PASSCODE) {
+        $_SESSION['audit_unlocked'] = true;
+    } else {
+        header("Location: dashboard.php?msg=auth_error");
+        exit;
+    }
+}
+
+// If session isn't unlocked, they are unauthorized
+if (!isset($_SESSION['audit_unlocked']) || $_SESSION['audit_unlocked'] !== true) {
+    header("Location: dashboard.php?msg=auth_error");
+    exit;
+}
+
 $limit = 20;
 $page = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;

@@ -35,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
                 $updateStmt = $pdo->prepare("UPDATE admin_users SET password_hash = ? WHERE username = ?");
                 if ($updateStmt->execute([$newHash, $currentUsername])) {
+                    log_audit_action($pdo, 'Changed Password', "Admin User: {$currentUsername}");
                     $success = "Password updated successfully.";
                 } else {
                     $error = "Failed to update password. Please try again.";
@@ -61,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
                 $insertStmt = $pdo->prepare("INSERT INTO admin_users (username, password_hash) VALUES (?, ?)");
                 if ($insertStmt->execute([$newUsername, $newHash])) {
+                    log_audit_action($pdo, 'Created Admin', "New Admin User: {$newUsername}");
                     $success = "New admin user '{$newUsername}' created successfully.";
                 } else {
                     $error = "Failed to create user. Please try again.";

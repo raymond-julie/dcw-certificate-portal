@@ -79,11 +79,16 @@ $totalCerts = $pdo->query("SELECT COUNT(*) FROM event_participants WHERE certifi
         <span style="font-size: 18px; font-weight: bold; letter-spacing: 0.5px;">Admin Panel - Certificate System</span>
     </div>
     <div>
-        <a href="audit_logs.php" style="margin-right: 15px;">Audit Logs</a>
+        <a href="#" onclick="return viewAuditLogs();" style="margin-right: 15px;">Audit Logs</a>
         <a href="manage_users.php" style="margin-right: 15px;">Manage Users</a>
         <a href="logout.php">Logout</a>
     </div>
 </div>
+
+<form id="auditLogForm" method="POST" action="audit_logs.php" style="display: none;">
+    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token()) ?>">
+    <input type="hidden" name="super_admin_passcode" id="audit_passcode" value="">
+</form>
 
 <div class="container">
     
@@ -210,6 +215,16 @@ $totalCerts = $pdo->query("SELECT COUNT(*) FROM event_participants WHERE certifi
             document.getElementById('menu-' + id).classList.add('show');
             btn.classList.add('active');
         }
+    }
+
+    function viewAuditLogs() {
+        let code = prompt("Security Check: Please enter the Super Admin Passcode to view Audit Logs:");
+        if (code) {
+            document.getElementById('audit_passcode').value = code;
+            document.getElementById('auditLogForm').submit();
+            return false;
+        }
+        return false;
     }
 
     document.addEventListener('click', function(e) {

@@ -49,7 +49,7 @@ $events = $stmt->fetchAll();
     <link rel="icon" type="image/png" href="https://dcwwiki.org/images/5/56/DCW_logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DCW Download Center</title>
+    <title>DCW Certificate Portal</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 

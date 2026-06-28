@@ -46,26 +46,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['action']) && $_POST['action'] === 'add_role') {
         $roleName = trim($_POST['role_name'] ?? '');
+        $existingTemplate = $_POST['existing_template'] ?? '';
 
         if (!$roleName) {
-        $error = "Role name is required.";
-    } elseif (!isset($_FILES['template']) || $_FILES['template']['error'] !== UPLOAD_ERR_OK) {
-        $error = "Please upload a valid PDF template.";
-    } else {
-        $tplDir = '../uploads/templates/';
-        if (!is_dir($tplDir)) mkdir($tplDir, 0777, true);
-
-        $templateExt = strtolower(pathinfo($_FILES['template']['name'], PATHINFO_EXTENSION));
-        if ($templateExt !== 'pdf') {
-            $error = "Template must be a PDF file.";
+            $error = "Role name is required.";
+        } elseif (empty($existingTemplate) && (!isset($_FILES['template']) || $_FILES['template']['error'] !== UPLOAD_ERR_OK)) {
+            $error = "Please upload a valid PDF template or select an existing one.";
         } else {
-            $templateFile = getUniqueFilename($tplDir, $_FILES['template']['name']);
-            move_uploaded_file($_FILES['template']['tmp_name'], $tplDir . $templateFile);
+            $templateFile = '';
+            
+            if (!empty($existingTemplate)) {
+                $templateFile = $existingTemplate;
+            } else {
+                $tplDir = '../uploads/templates/';
+                if (!is_dir($tplDir)) mkdir($tplDir, 0777, true);
 
-            $stmt = $pdo->prepare("INSERT INTO event_roles (event_id, role_name, template_file) VALUES (?, ?, ?)");
-            $stmt->execute([$eventId, $roleName, $templateFile]);
-            $success = "Role '$roleName' added successfully.";
-        }
+                $templateExt = strtolower(pathinfo($_FILES['template']['name'], PATHINFO_EXTENSION));
+                if ($templateExt !== 'pdf') {
+                    $error = "Template must be a PDF file.";
+                } else {
+                    $templateFile = getUniqueFilename($tplDir, $_FILES['template']['name']);
+                    move_uploaded_file($_FILES['template']['tmp_name'], $tplDir . $templateFile);
+                }
+            }
+
+            if (!$error && $templateFile) {
+                // Inherit layout if using an existing template
+                $visualSettings = null;
+                $rotation = 0;
+                if (!empty($existingTemplate)) {
+                    $stmtFind = $pdo->prepare("SELECT visual_settings, rotation FROM event_roles WHERE template_file = ? LIMIT 1");
+                    $stmtFind->execute([$templateFile]);
+                    $existingRoleData = $stmtFind->fetch();
+                    if ($existingRoleData) {
+                        $visualSettings = $existingRoleData['visual_settings'];
+                        $rotation = $existingRoleData['rotation'];
+                    }
+                }
+
+                $stmt = $pdo->prepare("INSERT INTO event_roles (event_id, role_name, template_file, visual_settings, rotation) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$eventId, $roleName, $templateFile, $visualSettings, $rotation]);
+                $success = "Role '$roleName' added successfully.";
+            }
         }
     } elseif (isset($_POST['action']) && $_POST['action'] === 'delete_role') {
         $passcode = trim($_POST['super_admin_passcode'] ?? '');
@@ -133,10 +155,35 @@ $roles = $stmt->fetchAll();
                     <input type="text" name="role_name" required placeholder="e.g. Speaker, Attendee">
                 </div>
                 <div class="form-group">
-                    <label>Role Template (PDF)</label>
-                    <input type="file" name="template" accept="application/pdf" required>
+                    <label>Role Template (Upload New PDF)</label>
+                    <input type="file" name="template" accept="application/pdf">
                 </div>
-                <button type="submit" class="btn" style="width: 100%;">Add Role</button>
+                
+                <?php if (count($roles) > 0): ?>
+                <div style="text-align: center; font-size: 13px; color: #777; margin: 10px 0;">-- OR --</div>
+                <div class="form-group">
+                    <label>Use Existing Template from this Event</label>
+                    <select name="existing_template">
+                        <option value="">-- Do not reuse --</option>
+                        <?php 
+                        // Get unique templates
+                        $seenTpls = [];
+                        foreach ($roles as $r): 
+                            if (!in_array($r['template_file'], $seenTpls)):
+                                $seenTpls[] = $r['template_file'];
+                        ?>
+                            <option value="<?= htmlspecialchars($r['template_file']) ?>">
+                                <?= htmlspecialchars($r['role_name']) ?>'s Template
+                            </option>
+                        <?php 
+                            endif;
+                        endforeach; 
+                        ?>
+                    </select>
+                </div>
+                <?php endif; ?>
+
+                <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Add Role</button>
             </form>
         </div>
 

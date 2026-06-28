@@ -12,9 +12,26 @@ if (isset($_POST['delete_event_id'])) {
     $csrf = $_POST['csrf_token'] ?? '';
     verify_csrf_token($csrf);
     
+    $passcode = trim($_POST['super_admin_passcode'] ?? '');
+    
+    if ($passcode !== SUPER_ADMIN_PASSCODE) {
+        // Redirect with error
+        header("Location: dashboard.php?msg=auth_error");
+        exit;
+    }
+    
     $deleteId = $_POST['delete_event_id'];
+    
+    // Get event name for logging before deleting
+    $stmtName = $pdo->prepare("SELECT name FROM events WHERE id = ?");
+    $stmtName->execute([$deleteId]);
+    $deletedEventName = $stmtName->fetchColumn() ?: 'Unknown';
+    
     $stmt = $pdo->prepare("DELETE FROM events WHERE id = ?");
     $stmt->execute([$deleteId]);
+    
+    log_audit_action($pdo, 'Deleted Event', "Event ID: {$deleteId}, Name: {$deletedEventName}");
+    
     header("Location: dashboard.php?msg=deleted");
     exit;
 }
@@ -205,6 +222,11 @@ $totalCerts = $pdo->query("SELECT COUNT(*) FROM event_participants WHERE certifi
 <script>
     window.flashMessage = 'Event deleted successfully.';
     window.flashMessageType = 'success';
+</script>
+<?php elseif (isset($_GET['msg']) && $_GET['msg'] === 'auth_error'): ?>
+<script>
+    window.flashMessage = 'Security Error: Invalid Super Admin Passcode.';
+    window.flashMessageType = 'error';
 </script>
 <?php endif; ?>
 </body>

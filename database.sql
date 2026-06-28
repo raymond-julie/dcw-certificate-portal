@@ -58,3 +58,12 @@ CREATE TABLE IF NOT EXISTS event_participants (
 -- Add Indexes for Performance
 CREATE INDEX idx_event_id ON event_participants(event_id);
 CREATE INDEX idx_participant_id ON event_participants(participant_id);
+
+-- Create Audit Logs Table
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    admin_username VARCHAR(50) NOT NULL,
+    action_type VARCHAR(50) NOT NULL,
+    details VARCHAR(255) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

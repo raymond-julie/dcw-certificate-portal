@@ -37,7 +37,26 @@ $roleName = $certData['role_name'] ? " as " . htmlspecialchars($certData['role_n
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
     <title>Credential Verification - <?= htmlspecialchars($certData['full_name']) ?></title>
+    <meta name="title" content="Verified Credential: <?= htmlspecialchars($certData['full_name']) ?> - <?= htmlspecialchars($certData['event_name']) ?>">
+    <meta name="description" content="This official credential was securely issued by DCW. Verify the authenticity of this certificate online.">
+
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://<?= htmlspecialchars($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) ?>">
+    <meta property="og:title" content="Verified Credential: <?= htmlspecialchars($certData['full_name']) ?> - <?= htmlspecialchars($certData['event_name']) ?>">
+    <meta property="og:description" content="This official credential was securely issued by DCW. Verify the authenticity of this certificate online.">
+    <meta property="og:image" content="https://dcwwiki.org/images/5/56/DCW_logo.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://<?= htmlspecialchars($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) ?>">
+    <meta property="twitter:title" content="Verified Credential: <?= htmlspecialchars($certData['full_name']) ?> - <?= htmlspecialchars($certData['event_name']) ?>">
+    <meta property="twitter:description" content="This official credential was securely issued by DCW. Verify the authenticity of this certificate online.">
+    <meta property="twitter:image" content="https://dcwwiki.org/images/5/56/DCW_logo.png">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');

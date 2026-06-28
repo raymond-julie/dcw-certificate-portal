@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Define explicit font path to avoid Linux path resolution bugs
-define('K_PATH_FONTS', __DIR__ . '/vendor/TCPDF-main/fonts/');
+define('K_PATH_FONTS', __DIR__ . '/vendor/tecnickcom/tcpdf/fonts/');
 
 if (!isset($_GET['id'])) {
     die("Certificate ID is required.");

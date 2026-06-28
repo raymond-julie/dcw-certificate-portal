@@ -40,6 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("INSERT INTO events (name, linkedin_caption, cert_prefix) VALUES (?, ?, ?)");
         $stmt->execute([$eventName, $linkedinCaption, $certPrefix]);
         $newEventId = $pdo->lastInsertId();
+        
+        log_audit_action($pdo, 'Created Event', "Event ID: {$newEventId}, Name: {$eventName}");
+        
         header("Location: manage_roles.php?event_id=" . $newEventId);
         exit;
     }

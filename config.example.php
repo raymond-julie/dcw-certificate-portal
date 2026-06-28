@@ -41,4 +41,21 @@ function verify_csrf_token($token) {
     }
     return true;
 }
+
+// Security Configuration
+define('SUPER_ADMIN_PASSCODE', '1234');
+
+// Audit Log Helper
+function log_audit_action($pdo, $action, $details = '') {
+    if (!isset($_SESSION['admin_username'])) {
+        return; // Don't log if not authenticated
+    }
+    
+    $stmt = $pdo->prepare("INSERT INTO audit_logs (admin_username, action_type, details) VALUES (?, ?, ?)");
+    $stmt->execute([
+        $_SESSION['admin_username'],
+        substr($action, 0, 50),
+        substr($details, 0, 255)
+    ]);
+}
 ?>

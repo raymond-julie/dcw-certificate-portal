@@ -32,11 +32,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $eventName = trim($_POST['name'] ?? '');
     $linkedinCaption = trim($_POST['linkedin_caption'] ?? '');
 
-    if (!$eventName) {
+    $passcode = trim($_POST['super_admin_passcode'] ?? '');
+
+    if ($passcode !== SUPER_ADMIN_PASSCODE) {
+        $error = "Security Error: Invalid Super Admin Passcode.";
+    } elseif (!$eventName) {
         $error = "Event name is required.";
     } else {
         $stmtUpdate = $pdo->prepare("UPDATE events SET name = ?, linkedin_caption = ? WHERE id = ?");
         $stmtUpdate->execute([$eventName, $linkedinCaption, $eventId]);
+        
+        log_audit_action($pdo, 'Edited Event', "Event ID: {$eventId}, New Name: {$eventName}");
         
         $success = "Event updated successfully.";
         // Refresh event data
@@ -92,17 +98,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
         
+        <div class="form-group" style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+            <label style="color: #d9534f;">Super Admin Passcode <span style="font-size: 11px; color: #999; font-weight: normal;">(Required to save changes)</span></label>
+            <input type="password" name="super_admin_passcode" required placeholder="Enter passcode to authorize">
+        </div>
+        
         <button type="submit" class="btn" style="width: 100%; margin-bottom: 15px;">Save Changes</button>
     </form>
     
-    <form method="POST" action="dashboard.php" onsubmit="return confirm('Are you sure you want to completely delete this event? This will erase all associated participants and certificates permanently.');">
+    <form method="POST" action="dashboard.php" id="deleteForm" onsubmit="return confirmDelete();">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token()) ?>">
         <input type="hidden" name="delete_event_id" value="<?= htmlspecialchars($eventId) ?>">
+        <input type="hidden" name="super_admin_passcode" id="delete_passcode" value="">
         <button type="submit" class="btn btn-red" style="width: 100%;">Delete Event</button>
     </form>
 </div>
 
 <script src="script.js"></script>
+<script>
+    function confirmDelete() {
+        if (!confirm('Are you sure you want to completely delete this event? This will erase all associated participants and certificates permanently.')) {
+            return false;
+        }
+        
+        let code = prompt("Security Check: Please enter the Super Admin Passcode to authorize this deletion:");
+        if (code) {
+            document.getElementById('delete_passcode').value = code;
+            return true;
+        }
+        
+        alert("Deletion cancelled: Passcode is required.");
+        return false;
+    }
+</script>
 <?php if ($error): ?>
 <script>
     window.flashMessage = <?= json_encode($error) ?>;

@@ -38,7 +38,7 @@ Ensure your server or local environment has PHP 8.0+ installed with the `pdo_mys
 ### 2. Clone & Setup
 Clone the repository to your server's public directory (or `htdocs`):
 ```bash
-git clone https://github.com/Zaidusyy/dcw-certificate-portal.git
+git clone https://github.com/Deoband-Community-Wikimedia/dcw-certificate-portal.git
 cd dcw-certificate-portal
 ```
 

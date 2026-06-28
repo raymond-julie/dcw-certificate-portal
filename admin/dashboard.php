@@ -60,7 +60,7 @@ $events = $stmt->fetchAll();
 
 // Analytics Queries
 $totalEvents = $pdo->query("SELECT COUNT(*) FROM events")->fetchColumn();
-$totalParticipants = $pdo->query("SELECT COUNT(*) FROM participants")->fetchColumn();
+$totalParticipants = $pdo->query("SELECT COUNT(DISTINCT participant_id) FROM event_participants")->fetchColumn();
 $totalCerts = $pdo->query("SELECT COUNT(*) FROM event_participants WHERE certificate_id IS NOT NULL")->fetchColumn();
 
 ?>

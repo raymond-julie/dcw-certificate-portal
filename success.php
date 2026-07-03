@@ -30,9 +30,9 @@ $verifyUrl = $protocol . $_SERVER['HTTP_HOST'] . $baseDir . '/verify/' . $certId
 $eventName = urlencode($certData['event_name']);
 $issueYear = date('Y', strtotime($certData['created_at']));
 $issueMonth = date('n', strtotime($certData['created_at']));
-$orgNameEncoded = urlencode('Deoband Community Wikimedia');
-$linkedInAddUrl = "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name={$eventName}&organizationName={$orgNameEncoded}&issueYear={$issueYear}&issueMonth={$issueMonth}&certUrl=" . urlencode($verifyUrl) . "&certId=" . urlencode($certId);
+$organizationId = '92536649';
 
+$linkedInAddUrl = "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name={$eventName}&organizationId={$organizationId}&issueYear={$issueYear}&issueMonth={$issueMonth}&certUrl=" . urlencode($verifyUrl) . "&certId=" . urlencode($certId);
 $dbCaption = $certData['linkedin_caption'] ?? '';
 $customCaption = trim($dbCaption) !== '' ? str_replace(['{EVENT_NAME}', '{URL}'], [$certData['event_name'], $verifyUrl], $dbCaption) : "I just earned my certificate for completing {$certData['event_name']}! Check out my verified credential here: {$verifyUrl}";
 

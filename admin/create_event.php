@@ -31,14 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $eventName = trim($_POST['name'] ?? '');
     $linkedinCaption = trim($_POST['linkedin_caption'] ?? '');
+    $customVerificationText = trim($_POST['custom_verification_text'] ?? '');
     $certPrefix = trim($_POST['cert_prefix'] ?? 'DCW');
     if ($certPrefix === '') $certPrefix = 'DCW';
 
     if (!$eventName) {
         $error = "Event name is required.";
     } else {
-        $stmt = $pdo->prepare("INSERT INTO events (name, linkedin_caption, cert_prefix) VALUES (?, ?, ?)");
-        $stmt->execute([$eventName, $linkedinCaption, $certPrefix]);
+        $stmt = $pdo->prepare("INSERT INTO events (name, linkedin_caption, custom_verification_text, cert_prefix) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$eventName, $linkedinCaption, $customVerificationText, $certPrefix]);
         $newEventId = $pdo->lastInsertId();
         
         log_audit_action($pdo, 'Created Event', "Event ID: {$newEventId}, Name: {$eventName}");
@@ -85,6 +86,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" name="cert_prefix" placeholder="e.g. DCW26" value="DCW" style="text-transform: uppercase;">
             <div style="font-size: 11px; color: #777; margin-top: 5px;">
                 Used for generating participant IDs (e.g., DCW26-K9X4M7).
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Custom Certificate Verification Text (Optional)</label>
+            <textarea name="custom_verification_text" rows="3" placeholder="e.g. This digital credential was securely issued by our partner organization, [Partner Name], and verified by Deoband Community Wikimedia." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; resize: vertical;"></textarea>
+            <div style="font-size: 11px; color: #777; margin-top: 5px;">
+                If left blank, defaults to: <em>This digital credential has been securely issued and verified by Deoband Community Wikimedia.</em>
             </div>
         </div>
         

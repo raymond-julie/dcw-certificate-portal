@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $eventName = trim($_POST['name'] ?? '');
     $linkedinCaption = trim($_POST['linkedin_caption'] ?? '');
+    $customVerificationText = trim($_POST['custom_verification_text'] ?? '');
 
     $passcode = trim($_POST['super_admin_passcode'] ?? '');
 
@@ -41,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!$eventName) {
         $error = "Event name is required.";
     } else {
-        $stmtUpdate = $pdo->prepare("UPDATE events SET name = ?, linkedin_caption = ? WHERE id = ?");
-        $stmtUpdate->execute([$eventName, $linkedinCaption, $eventId]);
+        $stmtUpdate = $pdo->prepare("UPDATE events SET name = ?, linkedin_caption = ?, custom_verification_text = ? WHERE id = ?");
+        $stmtUpdate->execute([$eventName, $linkedinCaption, $customVerificationText, $eventId]);
         
         log_audit_action($pdo, 'Edited Event', "Event ID: {$eventId}, New Name: {$eventName}");
         
@@ -50,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Refresh event data
         $event['name'] = $eventName;
         $event['linkedin_caption'] = $linkedinCaption;
+        $event['custom_verification_text'] = $customVerificationText;
     }
 }
 ?>
@@ -91,6 +93,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="form-group">
             <label>Certificate Prefix <span style="font-size: 11px; color: #999; font-weight: normal;">(Cannot be changed after creation)</span></label>
             <input type="text" name="cert_prefix" value="<?= htmlspecialchars($event['cert_prefix'] ?? 'DCW') ?>" readonly style="background-color: #e9ecef; color: #6c757d; cursor: not-allowed; text-transform: uppercase;">
+        </div>
+
+        <div class="form-group">
+            <label>Custom Certificate Verification Text (Optional)</label>
+            <textarea name="custom_verification_text" rows="3" placeholder="e.g. This digital credential was securely issued by our partner organization, [Partner Name], and verified by Deoband Community Wikimedia." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; resize: vertical;"><?= htmlspecialchars($event['custom_verification_text'] ?? '') ?></textarea>
+            <div style="font-size: 11px; color: #777; margin-top: 5px;">
+                If left blank, defaults to: <em>This digital credential has been securely issued and verified by Deoband Community Wikimedia.</em>
+            </div>
         </div>
         
         <div class="form-group">

@@ -15,7 +15,7 @@ $basePath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 if ($basePath === '/') $basePath = '';
 
 $stmt = $pdo->prepare("
-    SELECT p.full_name, e.name as event_name, e.certificate_issue_date, ep.created_at, er.role_name
+    SELECT p.full_name, e.name as event_name, e.certificate_issue_date, e.description, e.partners, ep.created_at, er.role_name
     FROM event_participants ep
     JOIN participants p ON ep.participant_id = p.id
     JOIN events e ON ep.event_id = e.id
@@ -256,7 +256,16 @@ $roleName = $certData['role_name'] ? " as " . htmlspecialchars($certData['role_n
             </div>
             
             <h1><?= htmlspecialchars($certData['full_name']) ?></h1>
-            <div class="meta">This credential was securely issued by Deoband Community Wikimedia.</div>
+            <div class="meta">
+                This credential was securely issued by Deoband Community Wikimedia<?= !empty($certData['partners']) ? " in partnership with " . htmlspecialchars($certData['partners']) : "" ?>.
+            </div>
+
+            <?php if (!empty($certData['description'])): ?>
+            <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 30px; font-size: 15px; color: #475569; line-height: 1.6;">
+                <strong>About this event:</strong><br>
+                <?= nl2br(htmlspecialchars($certData['description'])) ?>
+            </div>
+            <?php endif; ?>
 
             <div class="detail-row">
                 <div class="detail-label">Credential ID</div>

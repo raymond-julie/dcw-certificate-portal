@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS events (
     linkedin_caption TEXT NULL,
     cert_prefix VARCHAR(50) DEFAULT 'DCW',
     certificate_issue_date DATE NULL,
+    description TEXT NULL,
+    partners VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

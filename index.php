@@ -424,7 +424,6 @@ $events = $stmt->fetchAll();
             <nav class="header-nav">
                 <a href="https://dcwwiki.org/About" target="_blank">About</a>
                 <a href="https://dcwwiki.org/Programs" target="_blank">Programs</a>
-                <a href="https://dcwwiki.org/Partnerships" target="_blank">Partnerships</a>
                 <a href="https://dcwwiki.org/News" target="_blank">News</a>
                 <a href="https://dcwwiki.org/Vision_%26_Objectives" target="_blank">Vision</a>
             </nav>
@@ -513,7 +512,7 @@ $events = $stmt->fetchAll();
             <div class="footer-brand">
                 <img src="assets/DCW_logo.png" alt="DCW Logo" class="footer-logo">
                 <div class="footer-blurb">
-                    Deoband Community Wikimedia is an independent affiliate of the Wikimedia Foundation with a focus on global Muslim academia and scholarship. All website content is released under the <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike License</a> unless otherwise stated.
+                    Deoband Community Wikimedia is an independent affiliate of the Wikimedia Foundation with a focus on global Muslim academia and scholarship. 
                 </div>
             </div>
             <div class="footer-middle">
@@ -541,7 +540,6 @@ $events = $stmt->fetchAll();
                 <div class="footer-links">
                     <a href="https://dcwwiki.org/Subscribe" target="_blank">Subscribe</a>
                     <a href="https://dcwwiki.org/Membership" target="_blank">Become a member</a>
-                    <a href="https://dcwwiki.org/Friendly_space_policy" target="_blank">Friendly space policy</a>
                     <a href="https://dcwwiki.org/Contact" target="_blank">Contact</a>
                 </div>
             </div>

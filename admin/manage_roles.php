@@ -58,15 +58,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($existingTemplate)) {
                 $templateFile = $existingTemplate;
             } else {
-                $tplDir = '../uploads/templates/';
-                if (!is_dir($tplDir)) mkdir($tplDir, 0777, true);
+                $eventFolderName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $event['name']);
+                $tplBaseDir = '../uploads/templates/';
+                $eventTplDir = $tplBaseDir . $eventFolderName . '/';
+                
+                if (!is_dir($eventTplDir)) mkdir($eventTplDir, 0777, true);
 
                 $templateExt = strtolower(pathinfo($_FILES['template']['name'], PATHINFO_EXTENSION));
                 if ($templateExt !== 'pdf') {
                     $error = "Template must be a PDF file.";
                 } else {
-                    $templateFile = getUniqueFilename($tplDir, $_FILES['template']['name']);
-                    move_uploaded_file($_FILES['template']['tmp_name'], $tplDir . $templateFile);
+                    $filename = getUniqueFilename($eventTplDir, $_FILES['template']['name']);
+                    move_uploaded_file($_FILES['template']['tmp_name'], $eventTplDir . $filename);
+                    $templateFile = $eventFolderName . '/' . $filename;
                 }
             }
 
@@ -204,7 +208,9 @@ $roles = $stmt->fetchAll();
                             <?php foreach ($roles as $role): ?>
                                 <tr>
                                     <td><strong><?= htmlspecialchars($role['role_name']) ?></strong></td>
-                                    <td><a href="../uploads/templates/<?= htmlspecialchars($role['template_file']) ?>" target="_blank">View PDF</a></td>
+                                    <td>
+                                        <a href="../uploads/templates/<?= htmlspecialchars($role['template_file']) ?>" target="_blank">View PDF</a>
+                                    </td>
                                     <td style="display:flex; gap:10px;">
                                         <a href="preview_event.php?role_id=<?= $role['id'] ?>" class="btn btn-sm" title="Visual Editor">
                                             <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>

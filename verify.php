@@ -544,5 +544,3 @@ $roleName = $certData['role_name'] ? " as " . htmlspecialchars($certData['role_n
     </footer>
 </body>
 </html>
-</body>
-</html>

@@ -47,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'add_role') {
         $roleName = trim($_POST['role_name'] ?? '');
         $existingTemplate = $_POST['existing_template'] ?? '';
+        $customTemplateName = trim($_POST['custom_template_name'] ?? '');
 
         if (!$roleName) {
             $error = "Role name is required.";
@@ -68,7 +69,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($templateExt !== 'pdf') {
                     $error = "Template must be a PDF file.";
                 } else {
-                    $filename = getUniqueFilename($eventTplDir, $_FILES['template']['name']);
+                    // Determine base target name (use custom name if provided)
+                    if (!empty($customTemplateName)) {
+                        $targetFilename = basename($customTemplateName);
+                        if (strtolower(pathinfo($targetFilename, PATHINFO_EXTENSION)) !== 'pdf') {
+                            $targetFilename .= '.pdf';
+                        }
+                    } else {
+                        $targetFilename = $_FILES['template']['name'];
+                    }
+
+                    $filename = getUniqueFilename($eventTplDir, $targetFilename);
                     move_uploaded_file($_FILES['template']['tmp_name'], $eventTplDir . $filename);
                     $templateFile = $eventFolderName . '/' . $filename;
                 }
@@ -124,7 +135,7 @@ $roles = $stmt->fetchAll();
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="https://dcwwiki.org/images/5/56/DCW_logo.png">
+    <link rel="icon" type="image/png" href="https://dcwwiki.org/dcwwiki/images/5/56/DCW_logo.png">
     <meta charset="UTF-8">
     <title>Manage Roles - <?= htmlspecialchars($event['name']) ?></title>
     <link rel="stylesheet" href="style.css">
@@ -148,7 +159,6 @@ $roles = $stmt->fetchAll();
 
     <div style="display: flex; gap: 20px; flex-wrap: wrap;">
         
-        <!-- Add Role Form -->
         <div class="upload-box" style="flex: 1; min-width: 300px;">
             <h3>Add New Role</h3>
             <p>Create a role and upload its specific PDF template.</p>
@@ -162,6 +172,11 @@ $roles = $stmt->fetchAll();
                 <div class="form-group">
                     <label>Role Template (Upload New PDF)</label>
                     <input type="file" name="template" accept="application/pdf">
+                </div>
+                <div class="form-group">
+                    <label>Custom Template Name (Optional)</label>
+                    <input type="text" name="custom_template_name" placeholder="e.g. Senior_Engineer_Certificate">
+                    <small style="color: #666; font-size: 11px; display: block; margin-top: 4px;">Leaves original filename intact if blank. Ext (.pdf) auto-appends.</small>
                 </div>
                 
                 <?php if (count($roles) > 0): ?>
@@ -192,7 +207,6 @@ $roles = $stmt->fetchAll();
             </form>
         </div>
 
-        <!-- Roles List -->
         <div style="flex: 2; min-width: 400px;">
             <div class="table-responsive">
                 <table>

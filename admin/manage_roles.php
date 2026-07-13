@@ -176,7 +176,7 @@ $roles = $stmt->fetchAll();
                 <div class="form-group">
                     <label>Custom Template Name (Optional)</label>
                     <input type="text" name="custom_template_name" placeholder="e.g. Senior_Engineer_Certificate">
-                    <small style="color: #666; font-size: 11px; display: block; margin-top: 4px;">Leaves original filename intact if blank. Ext (.pdf) auto-appends.</small>
+                    <div class="help-text">Leaves original filename intact if blank. Ext (.pdf) auto-appends.</div>
                 </div>
                 
                 <?php if (count($roles) > 0): ?>

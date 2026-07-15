@@ -137,7 +137,7 @@ function renderElement($pdf, $settings, $text) {
     $pdf->Cell($strWidth, 0, $text, 0, 0, 'L');
 }
 
-// Render the 3 elements and QR code
+// Render the elements and QR code
 if (is_array($visualSettings)) {
     if (isset($visualSettings['name'])) {
         renderElement($pdf, $visualSettings['name'], $fullName);
@@ -147,6 +147,9 @@ if (is_array($visualSettings)) {
     }
     if (isset($visualSettings['date'])) {
         renderElement($pdf, $visualSettings['date'], $issueDate);
+    }
+    if (isset($visualSettings['custom_text']) && !empty($certData['custom_certificate_text'])) {
+        renderElement($pdf, $visualSettings['custom_text'], $certData['custom_certificate_text']);
     }
     if (isset($visualSettings['qrcode']) && !empty($visualSettings['qrcode']['enabled'])) {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";

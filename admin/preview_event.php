@@ -47,12 +47,17 @@ $defaultSettings = [
         'enabled' => false,
         'pos_x' => 10, 'pos_y' => 10, 'font_size' => 30,
         'text_color' => '0,0,0', 'text_align' => 'L', 'font_file' => '', 'font_name' => ''
+    ],
+    'custom_text' => [
+        'enabled' => false,
+        'pos_x' => 100, 'pos_y' => 120, 'font_size' => 18,
+        'text_color' => '0,0,0', 'text_align' => 'C', 'font_file' => '', 'font_name' => 'helvetica'
     ]
 ];
 
 $visualSettings = !empty($role['visual_settings']) ? json_decode($role['visual_settings'], true) : $defaultSettings;
 // Ensure all keys exist
-foreach (['name', 'certid', 'date', 'qrcode'] as $key) {
+foreach (['name', 'certid', 'date', 'qrcode', 'custom_text'] as $key) {
     if (!isset($visualSettings[$key])) {
         $visualSettings[$key] = $defaultSettings[$key];
     }
@@ -82,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mkdir($fontDir, 0777, true);
     }
     
-    foreach (['name', 'certid', 'date', 'qrcode'] as $element) {
+    foreach (['name', 'certid', 'date', 'qrcode', 'custom_text'] as $element) {
         $fileInputName = 'font_file_' . $element;
         if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
             $fontExt = strtolower(pathinfo($_FILES[$fileInputName]['name'], PATHINFO_EXTENSION));
@@ -142,7 +147,7 @@ if (is_dir($fontDir)) {
     
     <!-- Dynamic Font Loading for Elements -->
     <style id="dynamic-fonts-style">
-        <?php foreach (['name', 'certid', 'date', 'qrcode'] as $key): ?>
+        <?php foreach (['name', 'certid', 'date', 'qrcode', 'custom_text'] as $key): ?>
             <?php if (!empty($visualSettings[$key]['font_file'])): ?>
                 @font-face {
                     font-family: 'Font_<?= $key ?>';
@@ -183,6 +188,7 @@ if (is_dir($fontDir)) {
                     <div id="el_certid" class="element-box" data-id="certid">CERT-1A2B3C4D</div>
                     <div id="el_date" class="element-box" data-id="date"><?= date('F j, Y') ?></div>
                     <div id="el_qrcode" class="element-box" data-id="qrcode" style="background: url('https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg') no-repeat center; background-size: 100% 100%;"></div>
+                    <div id="el_custom_text" class="element-box hidden" data-id="custom_text">Participant's Custom Text</div>
                 </div>
             </div>
         </div>
@@ -193,6 +199,7 @@ if (is_dir($fontDir)) {
                 <div class="tab" data-target="certid">Cert ID</div>
                 <div class="tab" data-target="date">Issue Date</div>
                 <div class="tab" data-target="qrcode">QR Code</div>
+                <div class="tab" data-target="custom_text">Custom Text</div>
             </div>
 
             <form id="settings-form" method="POST" action="" enctype="multipart/form-data">
@@ -272,6 +279,7 @@ if (is_dir($fontDir)) {
                 <input type="file" name="font_file_certid" id="real_file_certid" style="display:none" accept=".ttf">
                 <input type="file" name="font_file_date" id="real_file_date" style="display:none" accept=".ttf">
                 <input type="file" name="font_file_qrcode" id="real_file_qrcode" style="display:none" accept=".ttf">
+                <input type="file" name="font_file_custom_text" id="real_file_custom_text" style="display:none" accept=".ttf">
 
                 <button type="submit" class="btn btn-green" style="width: 100%; margin-top: 15px;">Save All Layouts</button>
             </form>
@@ -386,7 +394,7 @@ if (is_dir($fontDir)) {
         }
 
         function updateAllElementStyles() {
-            ['name', 'certid', 'date', 'qrcode'].forEach(applyStyleToElement);
+            ['name', 'certid', 'date', 'qrcode', 'custom_text'].forEach(applyStyleToElement);
         }
 
         const formInputs = {
@@ -433,7 +441,7 @@ if (is_dir($fontDir)) {
             formInputs.font_file.value = s.font_file;
             document.getElementById('lbl_current_tab').innerText = activeTab.toUpperCase();
             
-            if (activeTab === 'name' || activeTab === 'certid') {
+            if (activeTab === 'name' || activeTab === 'certid' || activeTab === 'custom_text') {
                 document.getElementById('sample_text_group').style.display = 'block';
                 formInputs.sample_text.value = document.getElementById('el_' + activeTab).innerText;
             } else {
@@ -463,7 +471,7 @@ if (is_dir($fontDir)) {
             formInputs.file_proxy.value = '';
             
             // Manage classes
-            ['name', 'certid', 'date', 'qrcode'].forEach(k => {
+            ['name', 'certid', 'date', 'qrcode', 'custom_text'].forEach(k => {
                 document.getElementById('el_' + k).classList.toggle('active', k === activeTab);
             });
         }
@@ -635,9 +643,9 @@ if (is_dir($fontDir)) {
         loadSettingsIntoForm();
 
         formInputs.sample_text.addEventListener('input', (e) => {
-            if (activeTab === 'name' || activeTab === 'certid') {
+            if (activeTab === 'name' || activeTab === 'certid' || activeTab === 'custom_text') {
                 const el = document.getElementById('el_' + activeTab);
-                el.innerText = e.target.value || (activeTab === 'name' ? 'Participant Name' : 'CERT-1A2B3C4D');
+                el.innerText = e.target.value || (activeTab === 'name' ? 'Participant Name' : (activeTab === 'certid' ? 'CERT-1A2B3C4D' : 'Participant\'s Custom Text'));
                 applyStyleToElement(activeTab);
             }
         });

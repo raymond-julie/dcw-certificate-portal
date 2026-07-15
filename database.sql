@@ -72,3 +72,14 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     details VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create Email Logs Table
+CREATE TABLE IF NOT EXISTS email_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    certificate_id VARCHAR(50) NOT NULL,
+    recipient_email VARCHAR(255) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    error_message TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (certificate_id) REFERENCES event_participants(certificate_id) ON DELETE CASCADE
+);

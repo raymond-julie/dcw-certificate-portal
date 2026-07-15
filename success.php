@@ -466,7 +466,7 @@ $linkedInShareMobile = "https://www.linkedin.com/sharing/share-offsite/?url=" . 
     </div>
 
     <script>
-        document.getElementById('downloadBtn').addEventListener('click', function(e) {
+        document.addEventListener('DOMContentLoaded', function() {
             const currentCertId = document.getElementById('certId').value;
 
             fetch('send-email.php', {

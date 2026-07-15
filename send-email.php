@@ -3,7 +3,7 @@ require_once 'config.php';
 // Include PHPMailer (Adjust paths based on your installation)
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-require 'vendor/autoload.php'; 
+require 'vendor/autoload.php';
 
 header('Content-Type: application/json');
 
@@ -33,7 +33,8 @@ if (!$certData || empty($certData['email'])) {
 // 2. Rebuild Verification URL Context
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 $baseDir = str_replace('\\', '/', dirname($_SERVER['PHP_SELF']));
-if ($baseDir === '/') $baseDir = '';
+if ($baseDir === '/')
+    $baseDir = '';
 $verifyUrl = $protocol . $_SERVER['HTTP_HOST'] . $baseDir . '/verify/' . $certId;
 
 // 3. Construct LinkedIn Pre-fill Parameters
@@ -50,12 +51,12 @@ $mail = new PHPMailer(true);
 
 try {
     $mail->isSMTP();
-    $mail->Host       = $_ENV['SMTP_HOST'];
-    $mail->SMTPAuth   = filter_var($_ENV['SMTP_AUTH'], FILTER_VALIDATE_BOOLEAN);
-    $mail->Username   = $_ENV['SMTP_USER'];
-    $mail->Password   = $_ENV['SMTP_PASS'];
+    $mail->Host = $_ENV['SMTP_HOST'];
+    $mail->SMTPAuth = filter_var($_ENV['SMTP_AUTH'], FILTER_VALIDATE_BOOLEAN);
+    $mail->Username = $_ENV['SMTP_USER'];
+    $mail->Password = $_ENV['SMTP_PASS'];
     $mail->SMTPSecure = $_ENV['SMTP_SECURE'];
-    $mail->Port       = $_ENV['SMTP_PORT'];
+    $mail->Port = $_ENV['SMTP_PORT'];
 
     $mail->setFrom($_ENV['SMTP_USER'], 'Deoband Community Wikimedia');
     $mail->addAddress($certData['email'], $certData['full_name']);
@@ -88,14 +89,14 @@ try {
     <body>
         <div class="email-wrapper">
             <div class="email-header">
-                <img src="https://dcwwiki.org/images/5/56/DCW_logo.png" alt="Deoband Community Wikimedia Logo">
+                <img src="' . htmlspecialchars($protocol . $_SERVER['HTTP_HOST'] . $baseDir . '/assets/DCW_logo.png') . '" alt="Deoband Community Wikimedia Logo">
             </div>
             <div class="email-body">
-                <h1>Congratulations, '.htmlspecialchars($certData['full_name']).'!</h1>
-                <p>Your official certificate for <strong>'.htmlspecialchars($certData['event_name']).'</strong> has been securely issued and archived.</p>
+                <h1>Congratulations, ' . htmlspecialchars($certData['full_name']) . '!</h1>
+                <p>Your official certificate for <strong>' . htmlspecialchars($certData['event_name']) . '</strong> has been securely issued and archived.</p>
                 
                 <div class="meta-box">
-                    <div class="meta-item"><strong>Credential ID:</strong> '.htmlspecialchars($certId).'</div>
+                    <div class="meta-item"><strong>Credential ID:</strong> ' . htmlspecialchars($certId) . '</div>
                     <div class="meta-item"><strong>Verification Status:</strong> Permanent Record Active</div>
                 </div>
 
@@ -103,17 +104,17 @@ try {
                 <p style="text-align: center; margin-bottom: 24px; font-size: 14px;">Add this credential directly to your LinkedIn profile to showcase it to your network:</p>
                 
                 <div style="text-align: center;">
-                    <a href="'.htmlspecialchars($linkedInAddUrl).'" target="_blank" class="btn-linkedin">
+                    <a href="' . htmlspecialchars($linkedInAddUrl) . '" target="_blank" class="btn-linkedin">
                         Add to LinkedIn Profile
                     </a>
                 </div>
 
                 <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 32px 0;">
                 <p style="font-size: 13px; margin-bottom: 4px;"><strong>Direct Verification Record URL:</strong></p>
-                <a href="'.htmlspecialchars($verifyUrl).'" class="verify-link" target="_blank">'.$verifyUrl.'</a>
+                <a href="' . htmlspecialchars($verifyUrl) . '" class="verify-link" target="_blank">' . $verifyUrl . '</a>
             </div>
             <div class="email-footer">
-                &copy; '.date('Y').' <a href="https://dcwwiki.org/">Deoband Community Wikimedia</a>. All Rights Reserved.
+                &copy; ' . date('Y') . ' <a href="https://dcwwiki.org/">Deoband Community Wikimedia</a>. All Rights Reserved.
             </div>
         </div>
     </body>

@@ -50,14 +50,14 @@ $mail = new PHPMailer(true);
 
 try {
     $mail->isSMTP();
-    $mail->Host       = SMTP_HOST;
-    $mail->SMTPAuth   = SMTP_AUTH;
-    $mail->Username   = SMTP_USER;
-    $mail->Password   = SMTP_PASS;
-    $mail->SMTPSecure = SMTP_SECURE;
-    $mail->Port       = SMTP_PORT;
+    $mail->Host       = $_ENV['SMTP_HOST'];
+    $mail->SMTPAuth   = filter_var($_ENV['SMTP_AUTH'], FILTER_VALIDATE_BOOLEAN);
+    $mail->Username   = $_ENV['SMTP_USER'];
+    $mail->Password   = $_ENV['SMTP_PASS'];
+    $mail->SMTPSecure = $_ENV['SMTP_SECURE'];
+    $mail->Port       = $_ENV['SMTP_PORT'];
 
-    $mail->setFrom(SMTP_USER, 'Deoband Community Wikimedia');
+    $mail->setFrom($_ENV['SMTP_USER'], 'Deoband Community Wikimedia');
     $mail->addAddress($certData['email'], $certData['full_name']);
     $mail->isHTML(true);
     $mail->Subject = "Verified Credential: " . $certData['event_name'];

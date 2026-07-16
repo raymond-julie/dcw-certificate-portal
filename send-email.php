@@ -123,17 +123,22 @@ if (file_exists($templatePath)) {
         $posX = $settings['pos_x'];
         $posY = $settings['pos_y'];
         $align = $settings['text_align'] ?? 'L';
+        $boxWidth = isset($settings['box_width']) ? (float)$settings['box_width'] : 0;
 
-        $strWidth = $pdf->GetStringWidth($text);
-
-        if ($align === 'C') {
-            $pdf->SetXY($posX - ($strWidth / 2), $posY);
-        } elseif ($align === 'R') {
-            $pdf->SetXY($posX - $strWidth, $posY);
-        } else {
+        if ($boxWidth > 0) {
             $pdf->SetXY($posX, $posY);
+            $pdf->MultiCell($boxWidth, 0, $text, 0, $align, false, 1);
+        } else {
+            $strWidth = $pdf->GetStringWidth($text);
+            if ($align === 'C') {
+                $pdf->SetXY($posX - ($strWidth / 2), $posY);
+            } elseif ($align === 'R') {
+                $pdf->SetXY($posX - $strWidth, $posY);
+            } else {
+                $pdf->SetXY($posX, $posY);
+            }
+            $pdf->Cell($strWidth, 0, $text, 0, 0, 'L');
         }
-        $pdf->Cell($strWidth, 0, $text, 0, 0, 'L');
     }
 
     if (is_array($visualSettings)) {

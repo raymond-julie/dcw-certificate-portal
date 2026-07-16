@@ -382,6 +382,8 @@ if (is_dir($fontDir)) {
                 el.style.fontSize = (s.font_size / docHeightPt * canvas.offsetHeight) + 'px';
                 let colorStr = s.text_color.trim();
                 el.style.color = colorStr.startsWith('#') ? colorStr : `rgb(${colorStr})`;
+            }
+            
             // Alignment and Box Width
             let boxWidthMM = parseFloat(s.box_width) || 0;
             if (boxWidthMM > 0 && key !== 'qrcode') {

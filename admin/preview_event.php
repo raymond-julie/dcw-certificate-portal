@@ -147,6 +147,15 @@ if (is_dir($fontDir)) {
             .container { flex-direction: column; }
             .controls { width: 100%; box-sizing: border-box; }
         }
+        /* ==========================================
+           INSERTION 1: CANVA-STYLE GUIDES CSS
+           ========================================== */
+        .guide-line { position: absolute; pointer-events: none; z-index: 9; }
+        .guide-center-v { left: 50%; top: 0; bottom: 0; border-left: 1.5px dashed #9933ff; opacity: 0.7; }
+        .guide-center-h { top: 50%; left: 0; right: 0; border-top: 1.5px dashed #9933ff; opacity: 0.7; }
+        .guide-element-v { top: 0; bottom: 0; border-left: 1.5px dashed #00beff; opacity: 0.7; display: none; }
+        .guide-element-h { left: 0; right: 0; border-top: 1.5px dashed #00beff; opacity: 0.7; display: none; }
+        /* ========================================== */
     </style>
     
     <!-- Dynamic Font Loading for Elements -->
@@ -188,6 +197,16 @@ if (is_dir($fontDir)) {
             <div class="editor-container">
                 <div id="pdf-container">
                     <canvas id="pdf-canvas"></canvas>
+                    <!-- ==========================================
+                         INSERTION 2: CANVA-STYLE GUIDES HTML
+                         ========================================== -->
+                    <!-- Purple Canvas Center Guides -->
+                    <div class="guide-line guide-center-v"></div>
+                    <div class="guide-line guide-center-h"></div>
+                    <!-- Blue Active Element Guides -->
+                    <div class="guide-line guide-element-v" id="guide_v"></div>
+                    <div class="guide-line guide-element-h" id="guide_h"></div>
+                    <!-- ========================================== -->
                     <div id="el_name" class="element-box active" data-id="name">Participant Name</div>
                     <div id="el_certid" class="element-box" data-id="certid">CERT-1A2B3C4D</div>
                     <div id="el_date" class="element-box" data-id="date"><?= date('F j, Y') ?></div>
@@ -577,7 +596,28 @@ if (is_dir($fontDir)) {
                 realInput.parentNode.replaceChild(newClone, realInput);
             }
         });
-
+// ==========================================
+        // INSERTION 3: UPDATE GUIDES LOGIC
+        // ==========================================
+        function updateElementGuides() {
+            const el = document.getElementById('el_' + activeTab);
+            const guideV = document.getElementById('guide_v');
+            const guideH = document.getElementById('guide_h');
+            
+            if (!el || el.classList.contains('hidden')) {
+                guideV.style.display = 'none';
+                guideH.style.display = 'none';
+                return;
+            }
+            
+            guideV.style.display = 'block';
+            guideH.style.display = 'block';
+            
+            // Align the blue guides to the active element's exact CSS coordinate point
+            guideV.style.left = el.style.left;
+            guideH.style.top = el.style.top;
+        }
+        // ==========================================
         // Dragging Logic
         let isDragging = false;
         let dragTarget = null;

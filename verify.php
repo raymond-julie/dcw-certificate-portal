@@ -39,6 +39,15 @@ if (!empty($certData['issue_date'])) {
 }
 $issueDate = date('F j, Y', strtotime($issueSource));
 $roleName = $certData['role_name'] ? " as " . htmlspecialchars($certData['role_name']) : "";
+
+// Combined verification text: custom text (or default) + partnership suffix if partners exist.
+// Consolidates what used to be two separate, overlapping .meta blocks (see issue #30).
+$verificationText = !empty($certData['custom_verification_text'])
+    ? htmlspecialchars($certData['custom_verification_text'])
+    : "This digital credential has been securely issued and verified by Deoband Community Wikimedia.";
+if (!empty($certData['partners'])) {
+    $verificationText .= " Issued in partnership with " . htmlspecialchars($certData['partners']) . ".";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -475,17 +484,13 @@ $roleName = $certData['role_name'] ? " as " . htmlspecialchars($certData['role_n
         </div>
 
         <div class="container">
-            <div class="meta">
-                <?= !empty($certData['custom_verification_text']) ? htmlspecialchars($certData['custom_verification_text']) : "This digital credential has been securely issued and verified by Deoband Community Wikimedia." ?>
-            </div>
-
             <div class="detail-row">
                 <div class="detail-label">Recipient Name</div>
                 <div class="detail-value" style="font-size: 18px; color: var(--primary-color); font-weight: 700;"><?= htmlspecialchars($certData['full_name']) ?></div>
             </div>
-            <h1><?= htmlspecialchars($certData['full_name']) ?></h1>
+
             <div class="meta">
-                This credential was securely issued by Deoband Community Wikimedia<?= !empty($certData['partners']) ? " in partnership with " . htmlspecialchars($certData['partners']) : "" ?>.
+                <?= $verificationText ?>
             </div>
 
             <div class="details-grid">

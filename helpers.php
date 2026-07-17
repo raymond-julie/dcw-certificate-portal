@@ -17,6 +17,7 @@ if (!function_exists('sanitizeForFilename')) {
         // Remove control characters (ASCII 0-31)
         $str = preg_replace('/[\x00-\x1F\x7F]/', '', $str);
         // Trim whitespace and dots
-        return trim($str, " .");
+        $str = trim($str, " .");
+        return $str === '' ? 'Untitled' : $str;
     }
 }

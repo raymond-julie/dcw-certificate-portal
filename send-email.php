@@ -47,7 +47,14 @@ $dateFormat = 'F j, Y';
 if (isset($visualSettings['date']['date_format'])) {
     $dateFormat = $visualSettings['date']['date_format'];
 }
-$issueSource = !empty($certData['certificate_issue_date']) ? $certData['certificate_issue_date'] : $certData['created_at'];
+// Date priority: participant-specific issue_date > event-level certificate_issue_date > created_at fallback
+if (!empty($certData['issue_date'])) {
+    $issueSource = $certData['issue_date'];
+} elseif (!empty($certData['certificate_issue_date'])) {
+    $issueSource = $certData['certificate_issue_date'];
+} else {
+    $issueSource = $certData['created_at'];
+}
 $issueDate = date($dateFormat, strtotime($issueSource));
 
 $pdf = new Fpdi();

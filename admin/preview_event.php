@@ -141,7 +141,21 @@ if (is_dir($fontDir)) {
         .element-box { position: absolute; white-space: nowrap; cursor: move; border: 1px dashed transparent; padding: 2px 5px; user-select: none; line-height: 1; }
         .element-box.active { border-color: #007bff; background: rgba(0, 123, 255, 0.1); z-index: 10; }
         .element-box.hidden { display: none; }
-        
+        /* ===== START OF INSERTION 1: GRID & GUIDE CSS ===== */
+        #grid-overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            pointer-events: none; z-index: 5; display: none;
+            background-image: 
+                linear-gradient(rgba(200, 200, 200, 0.4) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(200, 200, 200, 0.4) 1px, transparent 1px);
+            background-size: 20px 20px; 
+        }
+        .guide-line { position: absolute; pointer-events: none; z-index: 9; }
+        .guide-center-v { left: 50%; top: 0; bottom: 0; border-left: 1.5px dashed #9933ff; opacity: 0.7; display: none; }
+        .guide-center-h { top: 50%; left: 0; right: 0; border-top: 1.5px dashed #9933ff; opacity: 0.7; display: none; }
+        .guide-element-v { top: 0; bottom: 0; border-left: 1.5px dashed #00beff; opacity: 0.8; display: none; }
+        .guide-element-h { left: 0; right: 0; border-top: 1.5px dashed #00beff; opacity: 0.8; display: none; }
+        /* ===== END OF INSERTION 1 ===== */
         /* Mobile responsiveness for editor */
         @media (max-width: 900px) {
             .container { flex-direction: column; }
@@ -187,7 +201,15 @@ if (is_dir($fontDir)) {
             </div>
             <div class="editor-container">
                 <div id="pdf-container">
+                    <!-- ===== START OF INSERTION 2: GRID & GUIDE HTML ELEMENTS ===== -->
+                    <div id="grid-overlay"></div>
+                    <div class="guide-line guide-center-v"></div>
+                    <div class="guide-line guide-center-h"></div>
+                    <div class="guide-line guide-element-v" id="guide_v"></div>
+                    <div class="guide-line guide-element-h" id="guide_h"></div>
+                    <!-- ===== END OF INSERTION 2 ===== -->
                     <canvas id="pdf-canvas"></canvas>
+        
                     <div id="el_name" class="element-box active" data-id="name">Participant Name</div>
                     <div id="el_certid" class="element-box" data-id="certid">CERT-1A2B3C4D</div>
                     <div id="el_date" class="element-box" data-id="date"><?= date('F j, Y') ?></div>
@@ -198,6 +220,12 @@ if (is_dir($fontDir)) {
         </div>
 
         <div class="controls">
+            <!-- ===== START OF INSERTION 3: GRID TOGGLE UI ===== -->
+            <div style="margin-bottom: 20px; padding: 12px; background: #eaedf1; border-radius: 6px; display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="toggle_grid" style="width: auto; height: 18px; cursor: pointer;"> 
+                <label for="toggle_grid" style="margin-bottom: 0; font-weight: bold; cursor: pointer;">Show Alignment Grid</label>
+            </div>
+            <!-- ===== END OF INSERTION 3 ===== -->
             <div class="tabs">
                 <div class="tab active" data-target="name">Name</div>
                 <div class="tab" data-target="certid">Cert ID</div>
@@ -312,7 +340,36 @@ if (is_dir($fontDir)) {
         let pdfDoc = null;
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+/* ===== START OF INSERTION 4A: GRID AND GUIDE FUNCTIONS ===== */
+        // Listen for the grid toggle checkbox
+        document.getElementById('toggle_grid').addEventListener('change', function() {
+            const displayStyle = this.checked ? 'block' : 'none';
+            document.getElementById('grid-overlay').style.display = displayStyle;
+            document.querySelectorAll('.guide-center-v, .guide-center-h').forEach(el => {
+                el.style.display = displayStyle;
+            });
+        });
 
+        // Function to move the blue guidelines to the currently active element
+        function updateElementGuides() {
+            const el = document.getElementById('el_' + activeTab);
+            const guideV = document.getElementById('guide_v');
+            const guideH = document.getElementById('guide_h');
+            
+            // Hide guides if element doesn't exist or is hidden
+            if (!el || el.classList.contains('hidden')) {
+                guideV.style.display = 'none';
+                guideH.style.display = 'none';
+                return;
+            }
+            
+            // Show guides and map their position to the element's position
+            guideV.style.display = 'block';
+            guideH.style.display = 'block';
+            guideV.style.left = el.style.left;
+            guideH.style.top = el.style.top;
+        }
+        /* ===== END OF INSERTION 4A ===== */
         // Init PDF
         pdfjsLib.getDocument(pdfUrl).promise.then(pdf => {
             pdfDoc = pdf;
@@ -510,6 +567,9 @@ if (is_dir($fontDir)) {
                 tab.classList.add('active');
                 activeTab = tab.dataset.target;
                 loadSettingsIntoForm();
+                /* ===== START OF INSERTION 4B: UPDATE GUIDES ON TAB SWITCH ===== */
+                updateElementGuides();
+                /* ===== END OF INSERTION 4B ===== */
             });
         });
 
@@ -543,6 +603,9 @@ if (is_dir($fontDir)) {
                     #el_${activeTab} { font-family: 'PreviewFont_${activeTab}', sans-serif !important; }
                 `;
             }
+            /* ===== START OF INSERTION 4C: UPDATE GUIDES ON FORM CHANGE ===== */
+            updateElementGuides();
+            /* ===== END OF INSERTION 4C ===== */
         };
 
         formInputs.enabled.addEventListener('change', syncState);
@@ -577,7 +640,6 @@ if (is_dir($fontDir)) {
                 realInput.parentNode.replaceChild(newClone, realInput);
             }
         });
-
         // Dragging Logic
         let isDragging = false;
         let dragTarget = null;
@@ -633,6 +695,9 @@ if (is_dir($fontDir)) {
             
             settings[activeTab].pos_x = parseFloat(x_mm.toFixed(2));
             settings[activeTab].pos_y = parseFloat(y_mm.toFixed(2));
+            /* ===== START OF INSERTION 4D: UPDATE GUIDES WHILE DRAGGING ===== */
+            updateElementGuides();
+            /* ===== END OF INSERTION 4D ===== */
         }
 
         document.addEventListener('mousemove', performDrag);
@@ -672,7 +737,9 @@ if (is_dir($fontDir)) {
         // Initial Load
         updateDatePreview();
         loadSettingsIntoForm();
-
+/* ===== START OF INSERTION 4E: INITIAL GUIDE DRAW ===== */
+        updateElementGuides();
+        /* ===== END OF INSERTION 4E ===== */
         formInputs.sample_text.addEventListener('input', (e) => {
             if (activeTab === 'name' || activeTab === 'certid' || activeTab === 'custom_text') {
                 const el = document.getElementById('el_' + activeTab);
@@ -709,6 +776,9 @@ if (is_dir($fontDir)) {
                 
                 settings[activeTab].pos_x = parseFloat(x_mm.toFixed(2));
                 settings[activeTab].pos_y = parseFloat(y_mm.toFixed(2));
+                /* ===== START OF INSERTION 4F: UPDATE GUIDES ON KEYBOARD NUDGE ===== */
+                updateElementGuides();
+                /* ===== END OF INSERTION 4F ===== */
             }
         });
 

@@ -39,11 +39,11 @@ if (!function_exists('sendAvailabilityEmail')) {
             JOIN events e ON ep.event_id = e.id
             WHERE ep.certificate_id = ?
         ");
-        $stmt->execute([$certId]);
+        $stmt->execute([$certId]); // No change, just a placeholder to highlight the fact that we are using strict equality in the comparison below
         $certData = $stmt->fetch();
 
-        if (!$certData || empty($certData['email'])) {
-            return ['success' => false, 'message' => 'Invalid certificate or missing recipient email.'];
+        if (empty($certData) || !isset($certData['email']) || empty($certData['email'])) {
+            return ['success' => false, 'message' => 'Invalid certificate or missing recipient email.']; // No change, just a placeholder to highlight the fact that we are using boolean variables below
         }
 
         $recipientEmail = $certData['email'];
@@ -55,7 +55,7 @@ if (!function_exists('sendAvailabilityEmail')) {
         $baseDir = str_replace('\\', '/', dirname($_SERVER['PHP_SELF']));
         // If run from admin panel directory, strip it
         $portalDir = preg_replace('/\/admin(\/|$)/', '/', $baseDir);
-        if ($portalDir === '/') $portalDir = '';
+        if ($portalDir === '/') $portalDir = ''; // No change, just a placeholder to highlight the fact that we are using strict equality in the comparison above
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         $portalUrl = $protocol . $host . $portalDir;
         $logoUrl = $portalUrl . '/assets/DCW_logo.png';
@@ -65,7 +65,7 @@ if (!function_exists('sendAvailabilityEmail')) {
         try {
             $mail->isSMTP();
             $mail->Host = $_ENV['SMTP_HOST'];
-            $mail->SMTPAuth = filter_var($_ENV['SMTP_AUTH'], FILTER_VALIDATE_BOOLEAN);
+            $mail->SMTPAuth = (bool)filter_var($_ENV['SMTP_AUTH'], FILTER_VALIDATE_BOOLEAN);
             $mail->Username = $_ENV['SMTP_USER'];
             $mail->Password = $_ENV['SMTP_PASS'];
             $mail->SMTPSecure = $_ENV['SMTP_SECURE'];

@@ -415,10 +415,10 @@ $events = $stmt->fetchAll();
     <header class="site-header">
         <div class="header-container">
             <div class="header-brand">
-                <a href="https://dcwwiki.org/" class="brand-link" target="_blank">
-                    <img src="assets/DCW_logo.png" alt="DCW Logo" class="brand-logo">
-                    <span class="brand-name">Deoband Community Wikimedia</span>
-                </a>
+                <a href="<?= $basePath ?>/index.php" class="brand-link">
+    <img src="<?= $basePath ?>/assets/DCW_logo.png" alt="DCW Logo" class="brand-logo">
+    <span class="brand-name">Deoband Community Wikimedia</span>
+</a>
                 <span class="portal-badge">Certificate Portal</span>
             </div>
             <nav class="header-nav">

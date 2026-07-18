@@ -37,10 +37,11 @@ if (($isBot || $isPreview) && extension_loaded('imagick')) {
             $imagick->setResolution(150, 150);
             $imagick->readImageBlob($pdfData);
             $imagick->setIteratorIndex(0); // Focus on the first page
-            $imagick->setImageFormat('png');
+            $imagick->setImageFormat('jpeg');
+            $imagick->setImageCompressionQuality(80);
             
-            // Stream the PNG
-            header('Content-Type: image/png');
+            // Stream the JPEG
+            header('Content-Type: image/jpeg');
             header('Cache-Control: public, max-age=86400');
             echo $imagick->getImageBlob();
             
